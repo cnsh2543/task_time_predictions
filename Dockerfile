@@ -1,6 +1,6 @@
 # Use the official Python runtime as the base image
-# FROM public.ecr.aws/lambda/python:3.12-arm64
-FROM python:3.12-slim
+FROM public.ecr.aws/lambda/python:3.12-arm64
+
 
 # Set the working directory
 WORKDIR ${LAMBDA_TASK_ROOT}
@@ -16,7 +16,7 @@ ENV SPACY_DATA=/spacy_data
 
 # Install any necessary dependencies
 RUN python3 -m pip install -r requirements.txt
-RUN python3 -m spacy download en_core_web_sm
+RUN python3 -m spacy download en_core_web_md
 RUN python3 -c "import nltk; nltk.download('punkt', download_dir='/nltk_data')"  # Download 'punkt' tokenizer
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
