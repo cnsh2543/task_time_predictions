@@ -1,0 +1,5 @@
+spacy==3.7.4
+pickleshare==0.7.5
+nltk==3.8.1
+numpy==1.26.1
+scikit-learn==1.4.0
