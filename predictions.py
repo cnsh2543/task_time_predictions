@@ -195,7 +195,7 @@ def transform(self, data):
 def prediction(df):
 
     # df["module"] = re.match(r'^[A-Z]{3,}', df["modulename"].split(' ')[0]).group() if re.match(r'^[A-Z]{3,}', df["modulename"].split(' ')[0]) else 'OTHERS'
-    df["level"] =  re.match(r'^[A-Z]+(\d)', df["modulename"].split(' ')[0]).group(1) if re.match(r'^[A-Z]+(\d)', df["modulename"].split(' ')[0]) else '0'
+    df["level"] =  re.match(r'^[A-Z]+(\d)', df["modulename"].split(' ')[0]).group(1) if re.match(r'^[A-Z]+(\d)', df["modulename"].split(' ')[0]) else '4'
 
     # with open('le_module.pkl', 'rb') as file:
     #     le_module = pickle.load(file)
@@ -208,7 +208,7 @@ def prediction(df):
     with open('le_level.pkl', 'rb') as file:
         le_level = pickle.load(file)
     if df["level"] not in le_level.classes_:
-        df["level"] = 0
+        df["level"] = '4'
     else:
         df["level"] = le_level.transform([df["level"]])[0]
 
