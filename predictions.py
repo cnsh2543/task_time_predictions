@@ -273,7 +273,7 @@ def prediction(df):
 
 
     # Apply the extraction function to the DataFrame
-    tokenized_doc = [extract_term_solution(str(text), q_terms) for text in df['total_text']]
+    tokenized_doc = [extract_term_solution(str(df['total_text']), q_terms)]
 
     count_matrix = q_vectorizer.transform(tokenized_doc)
 
@@ -374,7 +374,7 @@ def prediction(df):
     # X_input.extend([ df[key] for key in included_fields])
     # X_input = np.array([X_sol_noun[0], X_title_noun[0]] + [ df[key] for key in included_fields])
     # X_input = np.array(X_input)
-
+    print(df)
     X_input = np.concatenate([X_q_noun, X_sol_noun, X_title_noun, np.array([ [df[key]] for key in included_fields]).T  ], axis=1)
     print(X_input)
     with open('rf_classifier.pkl', 'rb') as file:
