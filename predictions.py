@@ -252,9 +252,9 @@ def prediction(df):
         title_noun_vectorizer = pickle.load(file)
     # identified top20 terms with stronger correlation with label i.e >0.08 correlation and appeared
     # at least 5 times
-    title_verb_terms = ["challenge","flow","strain","fourier","beam","cycle calculations"]
+    title_noun_terms = ["challenge","hydrostatic","tunnel", "strain","wind","cycle calculations","fourier","flow","fluid","stresses"]
 
-    tokenized_doc = [extract_term_title(df['questiontitle'], title_verb_terms)]
+    tokenized_doc = [extract_term_title(df['questiontitle'], title_noun_terms)]
     count_matrix = title_noun_vectorizer.transform(tokenized_doc)
 
     X_title_noun = count_matrix.toarray()
@@ -263,11 +263,28 @@ def prediction(df):
 
     # extract verb, noun from solution
 
+    with open('q_vectorizer.pkl', 'rb') as file:
+        q_vectorizer = pickle.load(file)
+
+    # sol_terms = ["image","equation","use","substitute","follow","apply","part","find","note","give","rearrange","diagram","look","stress"]
+    # q_terms =[ 'delta', 'engine', 'find', 'frac', 'infty', 'left', 'omega', 'part', 'pressure', 'prime', 'river', 'shaft', 'show', 'text']
+    q_terms =[ 'delta', 'engine', 'find', 'frac', 'infty', 'left', 'omega', 'part', 'pressure', 'prime', 'shaft', 'show', 'text']
+
+
+
+    # Apply the extraction function to the DataFrame
+    tokenized_doc = [extract_term_solution(str(text), q_terms) for text in df['total_text']]
+
+    count_matrix = q_vectorizer.transform(tokenized_doc)
+
+    X_q_noun = count_matrix.toarray()
+
+
 
     with open('sol_vectorizer.pkl', 'rb') as file:
         sol_vectorizer = pickle.load(file)
 
-    sol_terms = ["image","equation","use","substitute","follow","apply","part","find","note","give","rearrange","diagram","look","stress"]
+    sol_terms = ['align', 'array', 'cfrac', 'dfrac', 'dot', 'e_', 'frac', 'lambda', 'ldots', 'left', 'mathrm', 'omega', 'partial', 'ratio', 'right', 'sigma_', 'text', 'theta']
 
 
     # Apply the extraction function to the DataFrame
@@ -336,7 +353,7 @@ def prediction(df):
         if steps == 0:
             steps = 1
 
-    # df["skill_x_total_sol_len"] = df["skill"] * df["total_sol_len"] 
+    df["skill_x_total_sol_len"] = df["skill"] * df["total_sol_len"] 
     # df["skill_x_steps"] = df["skill"] * df["steps"]
     # df["level_x_total_sol_len"] = df["total_sol_len"] * df["level"]
 
@@ -352,13 +369,13 @@ def prediction(df):
     print("after embedding", datetime.now().strftime("%H:%M:%S"))
 
     included_fields = ['setnumber', 'questionnumber', 'skill', 'level', 'verb_count_q', 'text_latex_stats', 'solution_latex_stats', 'text_len', 'latex_len', 
-                       'text_len_question', 'latex_len_question', 'char_len_total_text', 'total_sol_len', 'steps']
+                       'text_len_question', 'latex_len_question', 'char_len_total_text', 'total_sol_len', 'steps', 'skill_x_total_sol_len']
     # X_input = [X_sol_noun[0], X_title_noun[0]]
     # X_input.extend([ df[key] for key in included_fields])
     # X_input = np.array([X_sol_noun[0], X_title_noun[0]] + [ df[key] for key in included_fields])
     # X_input = np.array(X_input)
 
-    X_input = np.concatenate([X_sol_noun, X_title_noun, np.array([ [df[key]] for key in included_fields]).T  ], axis=1)
+    X_input = np.concatenate([X_q_noun, X_sol_noun, X_title_noun, np.array([ [df[key]] for key in included_fields]).T  ], axis=1)
     print(X_input)
     with open('rf_classifier.pkl', 'rb') as file:
         rf_classifier = pickle.load(file)
@@ -366,11 +383,4 @@ def prediction(df):
     print("after rf_classify", datetime.now().strftime("%H:%M:%S"))
 
     bucket = rf_classifier.predict(X_input)[0]
-    if bucket == 0: 
-        return 0, 10
-    elif bucket == 1: 
-        return 10,20
-    elif bucket == 2:
-        return 20,60 
-    else:
-        return 0, 0
+    return bucket - 8, bucket + 8
