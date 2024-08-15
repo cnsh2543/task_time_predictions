@@ -1,7 +1,7 @@
 import re
 from sklearn.preprocessing import LabelEncoder
 import nltk
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.feature_extraction.text import CountVectorizer
 import spacy
 # from sentence_transformers import SentenceTransformer
@@ -383,4 +383,7 @@ def prediction(df):
     print("after rf_classify", datetime.now().strftime("%H:%M:%S"))
 
     bucket = rf_classifier.predict(X_input)[0]
-    return bucket - 8, bucket + 8
+    bucket = round(bucket)
+    lower = max(bucket - 8,0)
+    upper = bucket + 8
+    return lower, upper
