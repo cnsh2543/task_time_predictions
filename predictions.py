@@ -31,7 +31,7 @@ def lambda_handler(event, context):
     '''
     try:
         print(event)
-        inputText = event['questionInfo']
+        inputText = event['body']['questionInfo']
         lowerBound, upperBound = prediction(inputText)
 
         return {
