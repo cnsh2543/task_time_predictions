@@ -30,6 +30,7 @@ def lambda_handler(event, context):
       - message: contains the text 
     '''
     try:
+        print(event)
         inputText = event['questionInfo']
         lowerBound, upperBound = prediction(inputText)
 
